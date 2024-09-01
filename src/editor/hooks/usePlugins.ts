@@ -81,7 +81,8 @@ export const usePlugins = (): any => {
         console.log('plugin.initPluginConfig', pluginConfig, plugins)
         for (const key in plugins) {
             const plugin = plugins[key];
-            const { views } = plugin.default;
+            const pluginDefault = plugin.default || {}; // 确保 plugin.default 是一个对象
+            const { views = [] } = pluginDefault;
             views.forEach((view: any) => {
                 pluginConfig.addComponent(view.name, view);
             })

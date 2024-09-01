@@ -48,7 +48,8 @@ export const useStencil = () => {
         let nodeList: any[] = [];
         for (const key in plugins) {
             const plugin = plugins[key];
-            const { views } = plugin.default;
+            const pluginDefault = plugin.default || {}; // 确保 plugin.default 是一个对象
+            const { views = [] } = pluginDefault;
             views.forEach((view: any) => {
                 if (groups.indexOf(view.group) === -1) {
                     if(view.group){
