@@ -9,7 +9,7 @@ export default {
      */
     uploadPicPlugins: (data: any) => {
         return axios.request({
-            url: 'tp_vis_files/up',
+            url: '/vis/plugin/up',
             method: 'post',
             data
         })
