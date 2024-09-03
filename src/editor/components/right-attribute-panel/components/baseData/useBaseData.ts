@@ -7,6 +7,7 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import DeviceAPI from "@/api/device";
+import * as Common from "@/common";
 import { reactive, ref } from "vue";
 
 
@@ -16,8 +17,7 @@ export const useBaseData = () => {
         static: '',
         dynamic: '',
         device: '',
-        projectId: '',
-        groupId: ''
+        groupId: '0'
     })
 
     const projectOptions = ref<any>([]);
@@ -29,48 +29,29 @@ export const useBaseData = () => {
         { value: 'device', label: '设备数据'}
     ]
 
-    const getProjectList = () => {
-        DeviceAPI.getProjectList(null)
-            .then(({ data: result }) => {
-                if (result.code === 200) {
-                    const { data } = result.data;
-                    console.log(data)
-                    projectOptions.value = data.map((item: any) => ({ value: item.id, label: item.name }))
-                }
-
-            })
-    }
-
     const getGroupList = (groupId: string) => {
-        DeviceAPI.getGroupList({ current_page: 1, per_page: 9999, business_id: groupId })
+        DeviceAPI.getGroupList({ current_page: Common.DEFAULT_API_CURRENT_PAGE, per_page: Common.DEFAULT_API_PER_PAGE, parent_id: groupId })
             .then(({ data: result }) => {
                 if (result.code === 200) {
                     console.log('getGroupList', result)
                     const { data } = result;
-                    groupOptions.value = data.data.map((item: any) => ({ value: item.id, label: item.name }))
+                    groupOptions.value = data.list.map((item: any) => ({ value: item.id, label: item.name }))
                 }
             })
     }
 
-    const handleChangeProject = (value: string) => {
-        console.log('handleChangeProject', value)
-        state.projectId = value;
-        getGroupList(value);
-    }
-
     const handleChangeGroup = (value: string) => {
-
+        console.log('handleChangeGroup', value)
+        state.groupId = value;
+        getGroupList(value);
     }
 
 
     return {
         state,
         bindOptions,
-        projectOptions,
         groupOptions,
-        getProjectList,
         getGroupList,
-        handleChangeProject,
         handleChangeGroup
     }
 }

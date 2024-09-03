@@ -12,18 +12,18 @@
 
             </template>
             <el-form>
-                <el-form-item label="选择项目">
+                <!--<el-form-item label="选择项目">
                     <el-select filterable v-model="state.projectId" placeholder="选择项目">
                         <el-option v-for="item in projectOptions" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
-                </el-form-item>
+                </el-form-item>-->
 
-                <el-form-item v-if="state.projectId" label="选择分组">
+                <!--<el-form-item label="选择分组">
                     <el-select filterable v-model="state.groupId" placeholder="选择分组">
                         <el-option v-for="item in groupOptions" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
-                </el-form-item>
+                </el-form-item>-->
 
                 <!-- <el-form-item v-if="state.groupId" label="选择设备">
                     <el-select filterable v-model="state.deviceId" placeholder="选择设备">
@@ -33,15 +33,15 @@
                     </el-select>
                 </el-form-item> -->
 
-                <el-form-item v-if="state.groupId" label="选择设备">
+                <el-form-item label="选择设备">
                     <el-cascader ref="deviceRef" style="width: 100%;margin-right:10px" v-model="state.deviceId"
                         placeholder="选择设备" :options="options.deviceOptions" clearable
                         :props="{ checkStrictly: true, emitPath: false }">
                     </el-cascader>
                 </el-form-item>
 
-                <el-form-item v-if="state.deviceId" label="选择属性">
-                    <el-select multiple v-model="state.properties" placeholder="选择属性">
+                <el-form-item v-if="state.deviceId" label="选择数据">
+                    <el-select multiple v-model="state.properties" placeholder="选择数据">
                         <el-option v-for="item in options.tslOptions" :key="item.name" :label="item.title" :value="item.name" />
                     </el-select>
                 </el-form-item>
@@ -58,16 +58,14 @@ import DeviceAPI from "@/api/device";
 
 const props = defineProps({
     index: Number,
-    data: Object
+    data: Object,
 });
 const emit = defineEmits(["delete", 'change']);
 
 const activeNames = ref<string[]>(['style']);
 const state = reactive<{
-    projectId: string,
-    projectName: string,
-    groupId: string,
-    groupName: string,
+    //groupId: string,
+    //groupName: string,
     deviceId: string,
     deviceName: string,
     pluginId: string,
@@ -77,10 +75,8 @@ const state = reactive<{
     propertyList: any[],
     devices: any[],
 }>({
-    projectId: '',
-    projectName: '',
-    groupId: '',
-    groupName: '',
+    //groupId: '',
+    //groupName: '',
     deviceId: '',
     deviceName: '',
     pluginId: '',
@@ -109,10 +105,8 @@ watch(() => state, (value) => {
 watch(() => props.data, async (val: any) => {
     console.log('watch props.data', val)
     if (JSON.stringify(val) === "{}") return;
-    // 项目
-    state.projectId = val.projectId || "";
     // 分组
-    state.groupId = val.groupId || "";
+    //state.groupId = val.groupId || "";
     // 设备
     state.deviceId = val.deviceId || "";
     // 插件
@@ -130,43 +124,35 @@ watch(() => props.data, async (val: any) => {
 }, { deep: true, immediate: true });
 
 onMounted(async () => {
-    projectOptions.value = await getProjectList();
+    //projectOptions.value = await getProjectList();
+    const deviceList = await getDeviceList();
+    options.deviceOptions = deviceList;
+    console.log('deviceOptions onMounted:', deviceOptions.value);
 });
-
-/**
- * 项目改变的回调
- */
-watch(() => state.projectId, async (value) => {
-    if (!value) return;
-    if (projectOptions.value.length) {
-        const index: number = projectOptions.value.findIndex((item: any) => item.value === state.projectId);
-        state.projectName = index > -1 ? projectOptions.value[index].label : ''
-    }
-
-    groupOptions.value = await getGroupList(value);
-    console.log('watch groupOptions', groupOptions.value)
-}, { immediate: true });
 
 /**
  * 分组改变的回调
  */
+/**
 watch(() => state.groupId, async (value) => {
     if (!value) return;
     const index: number = groupOptions.value.findIndex((item: any) => item.value === state.groupId);
-    state.groupName = index > -1 ? groupOptions.value[index].label : ''
-    options.deviceOptions = await getDeviceList(value);
+    //state.groupName = index > -1 ? groupOptions.value[index].label : ''
+    options.deviceOptions = await getDeviceList();
     state.devices = [...options.deviceOptions];
 
     console.log('watch deviceOptions', options.deviceOptions)
 
 }, { immediate: true, deep: true });
-
+ */
 /**
  * 设备改变的回调
  */
 watch(() => state.deviceId, async (value) => {
+    console.log('watch deviceId', state)
     if (!value) return;
     try {
+        getMetricsList(value);
         console.log('watch deviceId', value, options.deviceOptions)
         options.deviceOptions.forEach((item: any) => {
             if (item.children && item.children.length > 0) {
@@ -186,17 +172,19 @@ watch(() => state.deviceId, async (value) => {
 }, { immediate: true, deep: true });
 
 /**
- * @description: 插件id改变的回调
+ * @description: 设备id改变的回调
  * @return {*}
  */
+/**
 watch(() => state.pluginId, async (value) => {
     if (!value) return;
-    console.log('watch pluginId', value)
-    getPlugin(value);
+    console.log('watch Metrics', value)
+    getMetricsList(value);
 }, { immediate: true, deep: true })
-
+*/
 
 watchEffect(() => {
+    console.log('watch deviceId', state,options.deviceOptions)
     if (state.deviceId && JSON.stringify(options.deviceOptions) !== "{}" && JSON.stringify(options.deviceOptions) !== "[]") {
         const index: number = options.deviceOptions?.findIndex((item: any) => item.value === state.deviceId);
         state.deviceName = index > -1 ? options.deviceOptions[index].label : ''
@@ -220,38 +208,17 @@ watch(() => state.properties, async (value) => {
 })
 
 /**
- * 获取项目列表
- * @returns 
- */
-async function getProjectList() {
-    const { data: result } = await DeviceAPI.getProjectList(null);
-    if (result.code === 200) {
-        const { data } = result.data;
-        const options = data.map((item: any) => ({ value: item.id, label: item.name }))
-        return options;
-    }
-    // return new Promise((resolve, reject) => {
-    //     DeviceAPI.getProjectList(null)
-    //         .then(({ data: result }) => {
-    //             if (result.code === 200) {
-    //                 const { data } = result.data;
-    //                 const options = data.map((item: any) => ({ value: item.id, label: item.name }))
-    //                 resolve(options)
-    //             }
-    //         })
-
-    // })
-}
-/**
- * 通过项目id获取分组列表
+ * 通过分组id获取分组列表
  * @param projectId
  * @returns 
  */
+/**
 async function getGroupList(groupId: string) {
-    const { data: result } = await DeviceAPI.getGroupList({ current_page: 1, per_page: 9999, business_id: groupId })
+    const { data: result } = await DeviceAPI.getGroupList({ current_page: 1, per_page: 100, parent_id: groupId })
     if (result.code === 200) {
         const { data } = result;
-        return data.data.map((item: any) => ({ value: item.id, label: item.name }))
+        console.log('watch pluginId111', data.list)
+        return data.list.map((item: any) => ({ value: item.id, label: item.name }))
     }
     // return new Promise((resolve, reject) => {
     //     DeviceAPI.getGroupList({ current_page: 1, per_page: 9999, business_id: groupId })
@@ -264,56 +231,83 @@ async function getGroupList(groupId: string) {
     //         })
     // })
 }
-
+ */
 /**
- * 通过分组id获取设备列表
+ * 获取设备列表
  * @param id 
  */
-async function getDeviceList(id: string) {
-    const params = { current_page: 1, per_page: 9999, asset_id: id }
-    let { data: result } = await DeviceAPI.getDeviceList(params);
+async function getDeviceList() {
+    // const params = { current_page: 1, per_page: 9999 }
+    let { data: result } = await DeviceAPI.getDeviceList();
     console.log('getDeviceList', result)
     if (result.code !== 200) return [];
-    let arr = result.data?.data || [];
+    let arr = result.data || [];
     return arr.map((item: any) => {
-        if (item.children && item.children.length > 0) {
-            item.children = item.children.map((child: any) => {
-                return {
-                    label: child.device_name, value: child.device, pluginId: child.type
-                }
-            })
-        }
+        // if (item.children && item.children.length > 0) {
+        //     item.children = item.children.map((child: any) => {
+        //         return {
+        //             label: child.device_name, value: child.device, pluginId: child.type
+        //         }
+        //     })
+        // }
         return {
-            label: item.device_name,
-            value: item.device,
-            pluginId: item.type,
-            children: item.children || []
+            label: item.name,
+            value: item.id,
+            pluginId: item.device_config_id,
+          //  children: item.children || []
         }
     });
-     
-
 }
 
 /**
- * 通过设备Id获取插件
+ * 通过设备Id获取指标
  * @param deviceId
  * @returns 
  */
-function getPlugin(pluginId: string) {
-    console.log('watch getPlugin', pluginId)
+/**
+function getMetricsList(deviceId: string) {
+    console.log('watch getMetricsList', deviceId)
     return new Promise((resolve, reject) => {
-        DeviceAPI.getPluginByDeviceId({ current_page: 1, per_page: 9999, id: pluginId })
+        DeviceAPI.getdeviceMetricsList(deviceId)
             .then(({ data: result }) => {
                 if (result.code === 200) {
-                    const { data } = result.data;
-                    const tsl = JSON.parse(data[0].chart_data).tsl;
-                    const opt = JSON.parse(JSON.stringify(tsl.properties));
-                    options.tslOptions = opt;
-                    console.log('getPlugin opt', opt)
-                    resolve(opt);
+                    // const tsl = JSON.parse(data[0].chart_data).tsl;
+                    // const opt = JSON.parse(JSON.stringify(tsl.properties));
+                    // options.tslOptions = opt;
+                    // console.log('getPlugin opt', opt)
+                    // resolve(opt);
+
                 }
             })
     })
+
+}
+    */
+function getMetricsList(deviceId: string) {
+    console.log('watch getMetricsList', deviceId)
+    return DeviceAPI.getdeviceMetricsList(deviceId)
+        .then(({ data: result }) => {
+            if (result.code === 200) {
+                const tslOptions: { name: string; title: string }[] = [];
+                
+                // 遍历返回的数据
+                result.data.forEach((item: any) => {
+                    // 遍历每个 item 的 options
+                    item.options.forEach((opt: any) => {
+                        tslOptions.push({
+                            name: opt.key,
+                            title: opt.label || opt.key
+                        });
+                    });
+                });
+
+                // 更新 tslOptions
+                options.tslOptions = tslOptions;
+                console.log('getdeviceMetrics tslOptions:', tslOptions);
+
+                return { tslOptions };
+            }
+        });
 
 }
 

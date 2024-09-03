@@ -40,7 +40,7 @@ export const getDisplayComponent = (cpt: Component, nodeData: any, refType: any)
                     // 动态数据
                     // this.value = jsonData.data.dynamic;
                 } else if (jsonData.data.bindType === "device") {
-                    if (!jsonData.data.deviceData[0].projectId) return;
+                    //if (!jsonData.data.deviceData[0].projectId) return;
                     // 设备数据
                     const cb = (value: any) => {
                         this.value = value;

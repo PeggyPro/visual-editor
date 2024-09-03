@@ -3,27 +3,17 @@ import axios from "./interceptor/http";
 export default {
 
     /**
-     * 获取项目列表
-     * @param data 
-     * @returns 
-     */
-    getProjectList: (data: any) => {
-        return axios.request({
-            url: '/business/index',
-            method: 'post',
-            data
-        })
-    },
-
-    /**
-     * 获取分组列表
+     * 获取分组列表 不需要了
      * @param data 
      * @returns 
      */
     getGroupList: (data: any) => {
+        const page = data.current_page;
+        const page_size = data.per_page;
+        const parent_id = data.parent_id;
         return axios.request({
-            url: '/asset/list/c',
-            method: 'post',
+            url: `/device/group?page=${page}&page_size=${page_size}&parent_id=${parent_id}`,
+            method: 'get',
             data
         })
     },
@@ -33,24 +23,22 @@ export default {
      * @param data 
      * @returns 
      */
-    getDeviceList: (data: any) => {
+    getDeviceList: () => {
         return axios.request({
-            url: '/device/list/tree',
-            method: 'post',
-            data
+            url: '/device/tenant/list',
+            method: 'get',
         })
     },
 
     /**
-     * 根据设备Id获取插件
+     * 根据设备Id获取属性、遥测、事件等
      * @param data 
      * @returns 
      */
-    getPluginByDeviceId: (data: any) => {
+    getdeviceMetricsList: (data: any) => {
         return axios.request({
-            url: '/device/model/list',
-            method: 'post',
-            data
+            url: `/device/metrics/${data}`,
+            method: 'get',
         })
     }
 }

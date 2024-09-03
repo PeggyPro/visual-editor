@@ -6,7 +6,7 @@
         <div class="w-full" >
           <el-button style="width:100%" @click="addDevice">新增设备</el-button>
           <div class="device-container overflow-y-auto overflow-x-auto" >
-              <div v-for="(device, index) in deviceData" >
+              <div v-for="(device, index) in deviceData" :key="device.id">
                 <DeviceSelector :index="index" :data="device" @delete="handleDeleteDevice" @change="handleChangeDeviceData"/>
               </div>
           </div>
@@ -34,7 +34,6 @@ const emit = defineEmits(["onChange"]);
 const deviceData = ref<any>([
   {
     devices: [],
-    projectId: '',
     groupId: '',
     deviceId: '',
     property: '',
@@ -44,19 +43,19 @@ const deviceData = ref<any>([
 ])
 
 let { 
-  state, bindOptions, projectOptions, groupOptions,
-  getProjectList, getGroupList, handleChangeProject, handleChangeGroup 
+  state, bindOptions, groupOptions,
+  getGroupList, handleChangeGroup 
 } = useBaseData();
 
 onMounted(() => {
-  getProjectList()
+  //getGroupList('0')
+  //console.log('groupOptions onMounted:', groupOptions.value);
 })
 
 const addDevice = () => {
   deviceData.value.push({
     devices: [],
-    projectId: '',
-    groupId: '',
+    //groupId: '',
     deviceId: '',
     property: '',
     pluginId: '',
@@ -72,8 +71,7 @@ watch(() => props.data, (val) => {
     deviceData.value = [
       {
         devices: [],
-        projectId: '',
-        groupId: '',
+        //groupId: '',
         deviceId: '',
         property: '',
         pluginId: '',
