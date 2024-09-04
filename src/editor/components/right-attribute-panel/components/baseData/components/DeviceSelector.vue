@@ -288,7 +288,7 @@ function getMetricsList(deviceId: string) {
     return DeviceAPI.getdeviceMetricsList(deviceId)
         .then(({ data: result }) => {
             if (result.code === 200) {
-                const tslOptions: { name: string; title: string }[] = [];
+                const tslOptions: { name: string; title: string; dataType: string,unit: string }[] = [];
                 
                 // 遍历返回的数据
                 result.data.forEach((item: any) => {
@@ -296,7 +296,9 @@ function getMetricsList(deviceId: string) {
                     item.options.forEach((opt: any) => {
                         tslOptions.push({
                             name: opt.key,
-                            title: opt.label || opt.key
+                            title: opt.label || opt.key,
+                            dataType: opt.data_type,
+                            unit: opt.unit
                         });
                     });
                 });

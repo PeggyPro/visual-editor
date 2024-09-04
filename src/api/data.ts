@@ -11,8 +11,7 @@ export default {
         const deviceid = data
         return axios.request({
             url: `telemetry/datas/current/${deviceid}`,
-            method: 'get',
-            data
+            method: 'get'
         })
     },
 
@@ -23,8 +22,8 @@ export default {
      */
     getHistory: (data: any) => {
         return axios.request({
-            url: `telemetry/datas/history/pagination?deviceid=$(data.deviceId)&key=$(data.key)&start_time=$(data.start_time)&end_time=$(data.end_time)`,
-            method: 'get',
+            url: `telemetry/datas/history/pagination?device_id=${data.device_id}&key=${data.key}&start_time=${data.start_ts}&end_time=${data.end_ts}&export_excel=false`,
+            method: 'get'
         })
     },
 

@@ -126,15 +126,16 @@ class DataConfig {
                         console.log('DataConfig.parseData.deviceList', deviceList)
             if (!this.refType || this.refType === 'text' || this.refType === 'dashboard') {
                 // ===================================文本=========================================
-                let { data: result } = await DataAPI.getCurrentValue({ entity_id: deviceList[0].deviceId });
+                let { data: result } = await DataAPI.getCurrentValue(deviceList[0].deviceId);
                 if (result.code === 200) {
-                    const { data } = result;
+                    const data = result.data || [];
                     console.log('start', data)
                     let value = "无数据";
                     if (data && data.length !== 0) {
                         const property = deviceList[0].propertyList[0]?.name || deviceList[0].properties[0];
                         // value = data[0][property];
-                        value = data[property];
+                        let foundObject = data.find((item: any) =>item.key == property)
+                        value = (foundObject && foundObject.value)  || 0;
                     }
                     this.callback(value);
                 }
@@ -144,19 +145,21 @@ class DataConfig {
                 let values: any[] = [];
                 for(let i = 0; i < deviceList.length; i++) {
                     const device = deviceList[i];
-                    let { data: result } = await DataAPI.getCurrentValue({ entity_id: device.deviceId });
+                    let { data: result } = await DataAPI.getCurrentValue(device.deviceId);
                     if (result.code === 200) {
-                        const { data } = result;
+                        const data = result.data || [];
                         device.propertyList.forEach((property: any) => {
                             if (data && data.length !== 0) {
-                                let value = data[property.name] || 0;
-                                values.push({ type: property.title, value: Number(value)})
+                                let foundObject = data.find((item: any) =>item.key == property.name)
+                                let value = (foundObject && foundObject.value)  || 0;
+                                values.push({ type: property.title, sales: Number(value)})
                             } else {
                                 values.push({ type: property.title, value: 0})
                             }
                         })
                     }
                 }
+                
                 this.callback(JSON.stringify(values));
                 resolve(true);
             } else if (this.refType === 'histogram') {
@@ -164,13 +167,14 @@ class DataConfig {
                 let values: any[] = [];
                 for(let i = 0; i < deviceList.length; i++) {
                     const device = deviceList[i];
-                    let { data: result } = await DataAPI.getCurrentValue({ entity_id: device.deviceId });
+                    let { data: result } = await DataAPI.getCurrentValue(device.deviceId);
                     console.log('parseData.result', result)
                     if (result.code === 200) {
-                        const { data } = result;
+                        const data = result.data || [];
                         device.propertyList.forEach((property: any) => {
                             if (data && data.length !== 0) {
-                                let value = data[property.name] || 0;
+                                let foundObject = data.find((item: any) =>item.key == property.name)
+                                let value = (foundObject && foundObject.value)  || 0;
                                 values.push({ type: property.title, sales: Number(value)})
                             } else {
                                 values.push({ type: property.title, sales: 0})
@@ -191,26 +195,50 @@ class DataConfig {
                     const device = deviceList[i];
                     const properties = device.propertyList.map((property: any) => property.name);
                     console.log('DataConfig.parseData.curve', device.propertyList, properties)
-                    const params = {
-                        device_id: device.deviceId,
-                        attribute: ["systime", ...properties],
-                        start_ts: startTime,
-                        end_ts: endTime,
-                        rate: rate + ""
-                    }
-                    let { data: result } = await DataAPI.getHistory(params);
-                    if (result.code === 200) {
-                        const { data } = result;
-                        systime = data.systime;
-                        device.propertyList.forEach((property: any) => {
-                            let obj = {
-                                name: property.name,
-                                title: property.title,
-                                value: data[property.name]
+                    for (let i = 0; i < device.propertyList.length; i++) {
+                        let params = {
+                            device_id: device.deviceId,
+                            //attribute: ["systime", ...properties],
+                            key:device.propertyList[i].name,
+                            start_ts: startTime,
+                            end_ts: endTime,
+                            rate: rate + ""
                             }
-                            datas.push(obj);
-                        })
+                        let { data: result } = await DataAPI.getHistory(params);
+                        if (result.code === 200) {
+                            const data = result.data || [];
+                            data.forEach((it: any) => {
+                                let obj = {
+                                    name: device.propertyList[i].name,
+                                    title: device.propertyList[i].title,
+                                    value: it.value,
+                                    ts:it.ts
+                                    }
+                                datas.push(obj);
+                            })     
+                        }
                     }
+                    // const params = {
+                    //     device_id: device.deviceId,
+                    //     //attribute: ["systime", ...properties],
+                    //     key:properties[0],
+                    //     start_ts: startTime,
+                    //     end_ts: endTime,
+                    //     rate: rate + ""
+                    // }
+                    // let { data: result } = await DataAPI.getHistory(params);
+                    // if (result.code === 200) {
+                    //     const data = result.data || [];
+                    //     systime = data.systime;
+                    //     device.propertyList.forEach((property: any) => {
+                    //         let obj = {
+                    //             name: property.name,
+                    //             title: property.title,
+                    //             value: data[property.name]
+                    //         }
+                    //         datas.push(obj);
+                    //     })
+                    // }
                 }
                 let values = this.getCurveData(systime, datas);
                 this.callback(JSON.stringify(values));
@@ -254,24 +282,27 @@ class DataConfig {
             } else if (this.refType === 'table') {
                 // ===================================表格=========================================
                 
-                let values = [];
+                let values: any[] = [];
                 for(let i = 0; i < deviceList.length; i++) {
                     const device = deviceList[i];                    
                     const propertys = device.propertyList.map((x:any) => x.name)
-                    let { data: result } = await DataAPI.getCurrentValue({ entity_id: device.deviceId, attribute: ["systime", ...propertys] });
+                    let { data: result } = await DataAPI.getCurrentValue(device.deviceId);
                     console.log('parseData.result', result)
                     if (result.code === 200) {
-                        const { data } = result;
+                        const data = result.data || [];
                         if (data && data.length !== 0) {
                             const propCurrentValue = data;
-                            const valueItem:any = {deviceId:device.deviceId}
-                            for (const [key, value] of Object.entries(propCurrentValue)) {                                                                                            
-                                valueItem[`device_property_${device.deviceId}_${key}`] = value
-                                if(key === 'systime'){
-                                    valueItem.systime = value
-                                }                                
-                            }                                                                                   
-                            values.push(valueItem)                             
+                            device.propertyList.forEach((it: any) => {
+                                let foundObject = data.find((item: any) =>item.key == it.name)
+                                const valueItem:any = {deviceId:device.deviceId}
+                                for (const [key, value] of Object.entries(propCurrentValue)) {                                                                                            
+                                    valueItem[`device_property_${device.deviceId}_${key}`] = value
+                                    if(key === 'ts'){
+                                        valueItem.systime = value
+                                    }                                
+                                }                                                                                   
+                                values.push(valueItem) 
+                            })
                         }
                     }
                 }
@@ -284,7 +315,7 @@ class DataConfig {
                 this.stop();
             } else if (this.refType === 'weather') {
                 // ===================================气象站=========================================
-                let { data: result } = await DataAPI.getCurrentValue({ entity_id: deviceList[0].deviceId });
+                let { data: result } = await DataAPI.getCurrentValue(deviceList[0].deviceId);
                 if (result.code === 200) {
                     const { data } = result;
                     console.log('start', data)
