@@ -152,7 +152,7 @@ class DataConfig {
                             if (data && data.length !== 0) {
                                 let foundObject = data.find((item: any) =>item.key == property.name)
                                 let value = (foundObject && foundObject.value)  || 0;
-                                values.push({ type: property.title, sales: Number(value)})
+                                values.push({ type: property.title, value: Number(value)})
                             } else {
                                 values.push({ type: property.title, value: 0})
                             }
