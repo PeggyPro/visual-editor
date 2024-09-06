@@ -93,16 +93,33 @@ export const usePlugins = (): any => {
         try {
             let { data: result } = await PluginAPI.getPicPlugins({ current_page: Common.DEFAULT_API_CURRENT_PAGE, per_page: Common.DEFAULT_API_PER_PAGE })
             if (result.code === 200) {
-                const data = result.data?.data || [];
+                const data = result.data?.list || [];
                 let picPlugins: { default: { views: any[] } } = { default: { views: [] } }
-                const getPicUrl = (fileUrl: String) => {
+                const getPicUrl = (fileUrl: String): any => {
                     if (fileUrl.startsWith('.')) {
                         return localUrl + fileUrl.slice(1);
                     }
-                    return localUrl;
+                    data && data.forEach((plugin: any) => {
+                        plugin.files.forEach((file: any) => {
+                            const item = {
+                                name: plugin.plugin_name + "_" + file.file_name,
+                                description: "",
+                                group: plugin.plugin_name,
+                                icon: getPicUrl(file.file_url),
+                                size: { width: 200, height: 200 },
+                                Main: getDropPicComponent(getPicUrl(file.file_url)),
+                                Attribute: getPicAttrComponent(),
+                                Data: null
+                            };
+                            picPlugins.default.views.push(item);
+        
+                        })
+                    });
+                    return picPlugins;
                 }
                 data && data.forEach((plugin: any) => {
-                    plugin.files.forEach((file: any) => {
+                    const files = plugin.files || [];
+                    files.forEach((file: any) => {
                         const item = {
                             name: plugin.plugin_name + "_" + file.file_name,
                             description: "",
@@ -114,7 +131,7 @@ export const usePlugins = (): any => {
                             Data: null
                         };
                         picPlugins.default.views.push(item);
-    
+
                     })
                 });
                 return picPlugins;
