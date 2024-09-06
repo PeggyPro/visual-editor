@@ -146,6 +146,7 @@ export default defineComponent({
   },
   mounted() {
     this.getTableBodyHeight();
+    console.log("====table.main.mounted", this.value)
   },
   unmounted(){
     if(inter) {

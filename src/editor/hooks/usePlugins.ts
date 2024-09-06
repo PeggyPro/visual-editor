@@ -24,8 +24,6 @@ export const usePlugins = (): any => {
         options: { mode: 'editor' | 'display'} = { mode: 'editor'}
         ) =>  {
         const localPlugins: any = <any>Plugins;
-        console.log('loadPlugins', localPlugins)
-        
         let remotePlugins: Record<string, any> = {};
         const baseUrl = localUrl.replace(/:\d+/, "");
         
@@ -40,6 +38,7 @@ export const usePlugins = (): any => {
             initPluginConfig(remotePlugins);
             // 如果是编辑模式，则加载左侧组件列表
             options?.mode ==='editor' && initStencil(remotePlugins);
+
         }
         try {
             const { data: result } = await PluginAPI.getPluginList({ current_page: Common.DEFAULT_API_CURRENT_PAGE, per_page: Common.DEFAULT_API_PER_PAGE })
@@ -59,12 +58,10 @@ export const usePlugins = (): any => {
                 await initLocalPlugins();
                 _callback && _callback();
             }).catch(async (err) => {
-                console.log('loadPlugins.promise', err)
                 await initLocalPlugins();
                 _callback && _callback();
             })
         } catch (err) {
-            console.log('loadPlugins.try', err)
             await initLocalPlugins();
             _callback && _callback();
         }
@@ -78,7 +75,6 @@ export const usePlugins = (): any => {
     const initPluginConfig = (plugins: any): void => {
         const pluginConfig: IPluginConfig = PluginConfig.getInstance(plugins);
         pluginConfig.setPlugins(plugins);
-        console.log('plugin.initPluginConfig', pluginConfig, plugins)
         for (const key in plugins) {
             const plugin = plugins[key];
             const pluginDefault = plugin.default || {}; // 确保 plugin.default 是一个对象
@@ -94,34 +90,38 @@ export const usePlugins = (): any => {
      * @param plugins 
      */
     const getPicPlugins = async () => {
-        let { data: result } = await PluginAPI.getPicPlugins({ current_page: Common.DEFAULT_API_CURRENT_PAGE, per_page: Common.DEFAULT_API_PER_PAGE })
-        if (result.code === 200) {
-            const data = result.data?.data || [];
-            let picPlugins: { default: { views: any[] } } = { default: { views: [] } }
-            const getPicUrl = (fileUrl: String) => {
-                if (fileUrl.startsWith('.')) {
-                    return localUrl + fileUrl.slice(1);
+        try {
+            let { data: result } = await PluginAPI.getPicPlugins({ current_page: Common.DEFAULT_API_CURRENT_PAGE, per_page: Common.DEFAULT_API_PER_PAGE })
+            if (result.code === 200) {
+                const data = result.data?.data || [];
+                let picPlugins: { default: { views: any[] } } = { default: { views: [] } }
+                const getPicUrl = (fileUrl: String) => {
+                    if (fileUrl.startsWith('.')) {
+                        return localUrl + fileUrl.slice(1);
+                    }
+                    return localUrl;
                 }
-                return localUrl;
+                data && data.forEach((plugin: any) => {
+                    plugin.files.forEach((file: any) => {
+                        const item = {
+                            name: plugin.plugin_name + "_" + file.file_name,
+                            description: "",
+                            group: plugin.plugin_name,
+                            icon: getPicUrl(file.file_url),
+                            size: { width: 200, height: 200 },
+                            Main: getDropPicComponent(getPicUrl(file.file_url)),
+                            Attribute: getPicAttrComponent(),
+                            Data: null
+                        };
+                        picPlugins.default.views.push(item);
+    
+                    })
+                });
+                return picPlugins;
+            } else {
+                return [];
             }
-            data && data.forEach((plugin: any) => {
-                plugin.files.forEach((file: any) => {
-                    const item = {
-                        name: plugin.plugin_name + "_" + file.file_name,
-                        description: "",
-                        group: plugin.plugin_name,
-                        icon: getPicUrl(file.file_url),
-                        size: { width: 200, height: 200 },
-                        Main: getDropPicComponent(getPicUrl(file.file_url)),
-                        Attribute: getPicAttrComponent(),
-                        Data: null
-                    };
-                    picPlugins.default.views.push(item);
-
-                })
-            });
-            return picPlugins;
-        } else {
+        } catch(e) {
             return [];
         }
     }

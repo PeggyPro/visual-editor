@@ -1,3 +1,19 @@
+<!--
+ * @Author: chaoxiaoshu-mx leukotrichia@163.com
+ * @Date: 2024-09-03 20:23:58
+ * @LastEditors: chaoxiaoshu-mx leukotrichia@163.com
+ * @LastEditTime: 2024-09-04 18:04:38
+ * @FilePath: \visual-editor\src\plugins\tp-plugin\text\Attribute.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!--
+ * @Author: chaoxiaoshu-mx leukotrichia@163.com
+ * @Date: 2024-09-03 20:23:58
+ * @LastEditors: chaoxiaoshu-mx leukotrichia@163.com
+ * @LastEditTime: 2024-09-04 17:33:14
+ * @FilePath: \visual-editor\src\plugins\tp-plugin\text\Attribute.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
     <el-collapse v-model="activeNames">
         <el-collapse-item title="样式" name="style">
@@ -55,30 +71,35 @@ export default {
         return {
             alignOptions,
             activeNames: 'style',
-            formData: JSON.parse(JSON.stringify(styleData))
+            formData: {
+                ...styleData
+            }
         }
     },
     watch: {
         formData: {
             handler(val) {
+                console.log(`====Text.onChange: ${JSON.stringify(val)}`);
                 // 当自定义属性改变时，传递给Main.vue的style属性
-                this.$emit("onChange", {
+                this.$emit("onChange", {                    
                     style: { ...val, fontSize: val.fontSize + 'px', borderWidth: val.borderWidth + 'px' }
                 });
             },
-            deep: true
+            deep: true,
+            immediate: true
         },
         data: {
             handler(val) {
-                console.log('text.Attribute.watch.data', val)
                 const jsonStr = JSON.stringify(val);
                 if (jsonStr !== '{}') {
                     const jsonObj = JSON.parse(jsonStr);
                     jsonObj.fontSize = jsonObj.fontSize?.toString().replace("px", "") || styleData.fontSize
                     jsonObj.borderWidth = jsonObj.borderWidth?.toString().replace("px", "") || styleData.borderWidth
-                    this.formData = jsonObj;
+                    this.formData = {
+                        ...jsonObj
+                    };
                 } else {
-                    this.formData = JSON.parse(JSON.stringify(styleData));
+                    this.formData = { ...styleData };
                 }
             },
             immediate: true,

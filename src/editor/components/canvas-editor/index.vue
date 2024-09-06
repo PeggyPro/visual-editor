@@ -69,6 +69,10 @@ onMounted(() => {
     contextMenuState.visible = false;
   });
 
+  graph.on('cell:click', () => {
+    contextMenuState.visible = false;
+  })
+
   /**
    * 监听标尺事件
    */

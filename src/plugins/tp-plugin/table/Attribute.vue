@@ -160,7 +160,7 @@ export default defineComponent({
     },
     table: {
       handler(val) {
-        console.log("table.Attribute.table", val)
+        console.log("table.Attribute.table", JSON.stringify(val))
         this.$emit("onChange", {
           style: val
         });
@@ -187,6 +187,7 @@ export default defineComponent({
     if (this.data) {
       const jsonStr = JSON.stringify(this.data);
       if (jsonStr === '{}') return
+      console.log(`====table.attr.mounted: ${jsonStr}`)
       const formData = JSON.parse(jsonStr);
       this.table = formData;
     }

@@ -54,6 +54,7 @@ export default defineComponent({
 
       this.predefineColors.unshift(val)
       this.saveColorLocal()
+      console.log(`====changeColor: ${val}`)
       this.$emit('update:modelValue', val)
       this.$emit('change', val)
     },

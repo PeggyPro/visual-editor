@@ -685,6 +685,7 @@ class CanvasConfig implements ICanvasConfig {
     public showRuler(show: boolean): void {
         if (!this.graph)
             throw new Error('Graph is undefined.');
+        this.graphOptions.showRuler = show;
         this.rulerCallbacks.forEach(callback => callback({ show }));
     }
 
@@ -692,12 +693,19 @@ class CanvasConfig implements ICanvasConfig {
         if (!this.graph)
             throw new Error('Graph is undefined.');
         this.graphOptions.background = options;
-        this.callbackGraphOptions && this.callbackGraphOptions(this.graphOptions);
         this.graph.drawBackground(options);
+    }
+
+    public setGraphOptions(options: ICanvasConfig.GraphOptions) {
+        this.graphOptions = {
+            ...options
+        }
+        this.callbackGraphOptions && this.callbackGraphOptions(this.graphOptions)
     }
 
     public getGraphOptions(_cb: any) {
         this.callbackGraphOptions = _cb;
+        _cb(this.graphOptions)
         return this.graphOptions;
     }
 
@@ -829,14 +837,11 @@ class CanvasConfig implements ICanvasConfig {
         } else if (CanvasConfig.displayInstance) {
             pluginConfig.registerComponents("display", json.cells);
         }
+        console.log("====renderJson", json)
         this.graph.fromJSON(json);
     }
 
     public toJSON(): { cells: Cell.Properties[] } | { graph: any } {
-
-        console.log(this.graph?.getCells(), "this.graph?.getCells()")
-
-
         if (!this.graph)
             throw new Error('Graph is undefined.');
         const json = {

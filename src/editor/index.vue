@@ -75,6 +75,7 @@ onMounted(() => {
   })
   const displayContainer: HTMLElement = <HTMLElement>document.getElementById("containerId");
   resizeObserver.observe(displayContainer);
+  
 });
 
 let { save } = useTools();

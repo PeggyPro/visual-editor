@@ -1,3 +1,11 @@
+<!--
+ * @Author: chaoxiaoshu-mx leukotrichia@163.com
+ * @Date: 2024-09-03 20:23:58
+ * @LastEditors: chaoxiaoshu-mx leukotrichia@163.com
+ * @LastEditTime: 2024-09-05 21:19:56
+ * @FilePath: \visual-editor\src\editor\components\right-attribute-panel\components\CanvasAttr.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <!-- 画布属性 -->
 <template>
     <el-form label-width="80px" label-position="left">
@@ -53,7 +61,9 @@ const formData = reactive({
 
 onMounted(() => {
     const canvasConfig: CanvasConfig = CanvasConfig.getInstance();
+    
     canvasConfig.getGraphOptions((graphOptions: any) => {
+        console.log("====graphOptions", graphOptions)
         formData.backgroundColor = graphOptions.background.color || "#F2F7FA";
         formData.showGrid = graphOptions.showGrid;
         formData.showRuler = graphOptions.showRuler;

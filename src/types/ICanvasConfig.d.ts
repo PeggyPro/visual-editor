@@ -178,6 +178,12 @@ declare interface ICanvasConfig {
     setBackground(options: ICanvasConfig.BackgroundOptions): void;
 
     /**
+     * 配置画布
+     * @param options 
+     */
+    setGraphOptions(options: ICanvasConfig.GraphOptions)
+
+    /**
      * 获取画布背景
      */
     getGraphOptions(_cb: any): ICanvasConfig.GraphOptions;

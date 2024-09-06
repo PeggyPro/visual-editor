@@ -2,7 +2,7 @@
  * @Author: chaoxiaoshu-mx leukotrichia@163.com
  * @Date: 2023-11-02 09:49:23
  * @LastEditors: chaoxiaoshu-mx leukotrichia@163.com
- * @LastEditTime: 2023-11-02 16:03:11
+ * @LastEditTime: 2024-09-05 21:51:52
  * @FilePath: \tp-editor\src\editor\hooks\useCanvas.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -38,7 +38,7 @@ const useCanvas = (id?: any): any => {
     const initCanvas = async () => {
         // 获取画布管理器
         let canvasConfig: ICanvasConfig = CanvasConfig.getInstance(Common.DEFAULT_CONTAINER_ID);
-
+        
         loadPlugins(async () => {
             if (id) {
                 // 全局存储设备id
@@ -53,17 +53,22 @@ const useCanvas = (id?: any): any => {
                     localStorage.removeItem(Common.STORAGE_JSON_DATA_KEY);
                     if (jsonObj) {
                         canvasConfig.renderJSON(jsonObj);
-                        canvasConfig.center();
+                        setTimeout(() => {
+                            canvasConfig.center();
+                        }, 200);
                     }
                 }
             } else {
                 let storageJson = localStorage.getItem(Common.STORAGE_JSON_DATA_KEY);
                 if (storageJson) {
                     const jsonObj = isJSON(storageJson);
-                    console.log('useCanvas.storageJson', jsonObj)
+                    console.log('====useCanvas.storageJson', jsonObj)
                     if (jsonObj) {
                         canvasConfig.renderJSON(jsonObj);
-                        canvasConfig.center();
+                        canvasConfig.setGraphOptions(jsonObj.graph)
+                        setTimeout(() => {
+                            canvasConfig.center();
+                        }, 200);
                     }
                 }
             }

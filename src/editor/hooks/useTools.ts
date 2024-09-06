@@ -87,6 +87,7 @@ export const useTools = (): ITools => {
         }
     };
     function exportJPEG(fileName?: string, options?: any) {
+        console.log("====exportJPEG", fileName)
         CanvasConfig.getInstance().exportJPEG(fileName, options);
     };
     function exportPNG(fileName?: string, options?: any) {

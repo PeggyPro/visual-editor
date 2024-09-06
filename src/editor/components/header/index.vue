@@ -59,7 +59,7 @@
                     <el-dropdown-item command="json">导出JSON</el-dropdown-item>
                     <el-dropdown-item command="svg">导出SVG</el-dropdown-item>
                     <el-dropdown-item command="png">导出PNG</el-dropdown-item>
-                    <el-dropdown-item command="jpeg">导出JPEG</el-dropdown-item>
+                    <!-- <el-dropdown-item command="jpeg">导出JPEG</el-dropdown-item> -->
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>

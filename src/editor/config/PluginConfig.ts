@@ -26,7 +26,7 @@ class PluginConfig implements IPluginConfig  {
     }
 
     public static getInstance(plugins: any = null): PluginConfig {
-        console.log('plugin.PluginConfig.getInstance', plugins)
+        console.log('plugin.PluginConfig.getInstance', PluginConfig.instance, plugins)
         if (!PluginConfig.instance) {
             PluginConfig.instance = new PluginConfig(plugins);
         }
@@ -62,33 +62,36 @@ class PluginConfig implements IPluginConfig  {
         const plugins: any = this.plugins;
         for (const key in plugins) {
             const plugin = plugins[key];
-            const { views } = plugin.default;
-            views.forEach((view: any) => {
-                if (data) {
-                    data.forEach((cell: any) => {
-                        if (cell.shape === view.name) {
-                            // vue组件
-                            if (mode === 'editor') {
-                                const cpt: any = getDropComponent(view.Main);
-                                this.registerComponent(cell, cpt);
-                            } else if (mode === 'display') {
-                                const cpt: Component = getDisplayComponent(view.Main, cell.data || null, view.type);
-                                this.registerComponent(cell, cpt);
+            if (plugin?.default) {
+                const { views } = plugin.default;
+                views.forEach((view: any) => {
+                    if (data) {
+                        data.forEach((cell: any) => {
+                            if (cell.shape === view.name) {
+                                // vue组件
+                                if (mode === 'editor') {
+                                    const cpt: any = getDropComponent(view.Main);
+                                    this.registerComponent(cell, cpt);
+                                } else if (mode === 'display') {
+                                    const cpt: Component = getDisplayComponent(view.Main, cell.data || null, view.type);
+                                    this.registerComponent(cell, cpt);
+                                }
+                            } else if (cell.data && cell.data.pic) {
+                                // 图片
+                                if (mode === 'editor') {
+                                    const cpt: any = getDropPicComponent(cell.data.pic);
+                                    this.registerComponent(cell, cpt);
+                                } else if (mode === 'display') {
+                                    const cpt: any = getDisplayPicComponent(cell.data);
+                                    this.registerComponent(cell, cpt);
+                                }
                             }
-                        } else if (cell.data && cell.data.pic) {
-                            // 图片
-                            if (mode === 'editor') {
-                                const cpt: any = getDropPicComponent(cell.data.pic);
-                                this.registerComponent(cell, cpt);
-                            } else if (mode === 'display') {
-                                const cpt: any = getDisplayPicComponent(cell.data);
-                                this.registerComponent(cell, cpt);
-                            }
-                        }
-                    })
-                }
-
-            })
+                        })
+                    }
+    
+                })
+            }
+            
         }
         console.log('============registerComponents===================')
     }

@@ -164,6 +164,7 @@ export const useEvents = () => {
         // 点击node
         events.setClickEventListener((data: any) => {
             console.log('setClickEventListener', data)
+
             const temp = data.node || data.cell || null;
             // 节点工具
             // setNodeTools(temp, currentNode,graph);
@@ -181,7 +182,6 @@ export const useEvents = () => {
                     init({ x:data.x, y:data.y })
                     container.addEventListener('mousemove', onMouseMove)
                 }
-                console.log('如果点击的是画布')
                 return;
             }
 
@@ -191,13 +191,11 @@ export const useEvents = () => {
                 is3DMode.setFalse()
             }
             // 获取插件管理器
-            console.log('initEvents.PluginConfig.getInstance()')
             const pluginConfig: IPluginConfig = PluginConfig.getInstance();
             // 通过节点名称获取组件
             component = pluginConfig.getComponent(currentNode.shape);
             // 节点的附加数据
             nodeData.value = currentNode.store.data ;
-            console.log('initEvents.nodeData', nodeData.value)
             if (component) {
                 // 自定义组件
                 setNodeData(data);
@@ -325,7 +323,6 @@ export const useEvents = () => {
     // 画布上的内容有改动时，将内容存入浏览器缓存中
     const storageGraphData = () => {
         const canvasConfig: ICanvasConfig = CanvasConfig.getInstance();
-        console.log('storageGraphData.parama.id', params.id)
         setTimeout(() => {
             const json = canvasConfig.toJSON();
             localStorage.setItem(Common.STORAGE_JSON_DATA_KEY, JSON.stringify(json));
@@ -335,10 +332,9 @@ export const useEvents = () => {
 
     /**
      * 用户自定义组件的样式和绑定的数据改变后，会调用这个方法，更新画布上的节点数据
-     * @param dataT
+     * @param data
      */
     const onChange = (data: any) => {
-        console.log('useEvents.onChange1', data)
         let jsonStr = "{}";
         if (currentNode?.getData()) {
             // 从节点的附加数据中获取JSON字符串
@@ -358,7 +354,6 @@ export const useEvents = () => {
         }
         // 因为antv-x6的setData暂不支持Array，所以这里只能用JSON字符串来存储数据
         const jsonData = JSON.stringify(jsonObj);
-        console.log('useEvents.onChange', jsonData)
         // 更新节点的附加数据，写入JSON字符串
 
         currentNode.setData({

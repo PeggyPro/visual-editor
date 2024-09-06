@@ -1,3 +1,11 @@
+/*
+ * @Author: chaoxiaoshu-mx leukotrichia@163.com
+ * @Date: 2024-09-03 20:23:58
+ * @LastEditors: chaoxiaoshu-mx leukotrichia@163.com
+ * @LastEditTime: 2024-09-05 15:44:20
+ * @FilePath: \visual-editor\src\editor\components\canvas-editor\DropComponent.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { Component, defineComponent } from "vue";
 import { Node } from "@antv/x6";
 import { isJSON } from "@/utils"
@@ -59,15 +67,28 @@ export const getDropComponent = (cpt: Component): Component => {
                     // 从节点的附加数据中获取JSON字符串
                     jsonStr = node.getData()?.jsonData || "{}";
                 }
-                const jsonObj = isJSON(jsonStr);
-                if (data?.style) {
-                    jsonObj.style = { ...data.style };
+                this.updateNodeData(jsonStr, data);
+            },
+            init(data: any) {
+                const node: Node = (this as any).getNode() as Node;
+                let jsonStr = "{}";
+
+                if (!node?.getData()) {
+                    this.updateNodeData(jsonStr, data);
                 }
-                if (data?.data) {
-                    jsonObj.data = { ...data.data };
+            },
+            updateNodeData(oldValue: any, newValue: any) {
+                const jsonObj = isJSON(oldValue);
+                if (newValue?.style) {
+                    jsonObj.style = { ...newValue.style };
+                }
+                if (newValue?.data) {
+                    jsonObj.data = { ...newValue.data };
                 }
                 // 因为antv-x6的setData暂不支持Array，所以这里只能用JSON字符串来存储数据
                 const jsonData = JSON.stringify(jsonObj);
+
+                const node: Node = (this as any).getNode() as Node;
                 node.setData({
                     jsonData
                 })
@@ -75,7 +96,15 @@ export const getDropComponent = (cpt: Component): Component => {
         },
         render() {
             return (
-                <cpt id={this.id} value={this.value} style={this.style} option={this.option} data={this.data} onOnChange={(value: any) => this.onChange(value)}/>
+                <cpt 
+                    id={this.id} 
+                    value={this.value} 
+                    style={this.style} 
+                    option={this.option} 
+                    data={this.data} 
+                    onOnChange={(value: any) => this.onChange(value)}
+                    onInit={(value: any) => this.init(value)}
+                />
             )
         }
     })
