@@ -1,3 +1,11 @@
+/*
+ * @Author: chaoxiaoshu-mx leukotrichia@163.com
+ * @Date: 2024-09-03 20:23:58
+ * @LastEditors: chaoxiaoshu-mx leukotrichia@163.com
+ * @LastEditTime: 2024-09-06 17:34:08
+ * @FilePath: \visual-editor\src\display\useDisplay.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { CanvasConfig } from "@/editor/config";
 import VisualAPI from '@/api/visual';
 import { ref } from "vue";
@@ -50,7 +58,10 @@ export const useDisplay = (containerId: string) => {
             // 加载插件
             loadPlugins(() => {
                 // 渲染并注册插件
-                canvasConfig.renderJSON(jsonObj);
+                canvasConfig.renderJSON(jsonObj, () => {
+                    canvasConfig.center();
+                    // canvasConfig.zoomToFit();
+                });
                 // 初始化画布背景
                 canvasConfig.setBackground(jsonObj.graph.background);
                 // 初始化画布网格
@@ -63,10 +74,10 @@ export const useDisplay = (containerId: string) => {
                     console.log(edge.attr('targetData'))
                     canvasConfig.edgeAnimation(edge,edge.attr('targetData'))
                 })
-                canvasConfig.zoomToFit();
-                setTimeout(() => {
-                    canvasConfig.zoomToFit();
-                }, 1000);
+                // canvasConfig.zoomToFit();
+                // setTimeout(() => {
+                //     canvasConfig.zoomToFit();
+                // }, 1000);
             }, { mode: 'display' });
         }
     }

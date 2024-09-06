@@ -74,7 +74,9 @@ export const useTools = (): ITools => {
         console.log('importJSON', jsonObj)
         const instance= CanvasConfig.getInstance()
         if (jsonObj) {
-            instance.renderJSON(jsonObj);
+            instance.renderJSON(jsonObj, () => {
+                instance.center();
+            });
         }
         const  theg = instance.getGraph()
         if(theg){

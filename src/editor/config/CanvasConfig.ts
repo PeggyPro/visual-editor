@@ -644,7 +644,9 @@ class CanvasConfig implements ICanvasConfig {
     public center(): void {
         if (!this.graph)
             throw new Error('Graph is undefined.');
-        this.graph.centerContent();
+        setTimeout(() => {
+            this.graph?.centerContent();
+        }, 50)
     }
 
     public drawLine(): void {
@@ -823,7 +825,7 @@ class CanvasConfig implements ICanvasConfig {
         return Number(lowerLayerZIndex) - 1;
     }
 
-    public renderJSON(json: any): void {
+    public renderJSON(json: any, callback: () => void = () => {}): void {
         if (!this.graph)
             throw new Error('Graph is undefined.');
         const pluginConfig: IPluginConfig = PluginConfig.getInstance(null);
@@ -837,7 +839,7 @@ class CanvasConfig implements ICanvasConfig {
         } else if (CanvasConfig.displayInstance) {
             pluginConfig.registerComponents("display", json.cells);
         }
-        console.log("====renderJson", json)
+        this.graph.on('render:done', callback)
         this.graph.fromJSON(json);
     }
 

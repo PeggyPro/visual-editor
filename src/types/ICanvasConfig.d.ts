@@ -111,11 +111,12 @@ declare interface ICanvasConfig {
 
 
     edgeAnimation(edge:any,data:any): void;
+
     /**
      * 渲染节点数据
      * @param json 节点数据
      */
-    renderJSON(json: any): void;
+    renderJSON(json: any, callback: () => void = () => {}): void;
 
     /**
      * 画布自适应
