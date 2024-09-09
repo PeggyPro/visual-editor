@@ -3,29 +3,34 @@
 
     <spna>进入自由画线，拖动鼠标开始画线，拖动过程中单击加节点，直接单击或在线上右键退出,</spna>
   </div>
-  <div class="relative w-full">
+  <div class="flex w-full justify-between">
 
-    <div class="absolute text-left pl-6">
-      <el-icon class="align-middle" :size="20">
-        <House />
-      </el-icon>
-      <!-- <span class="align-middle pl-6" style="overflow:hidden;text-overflow:ellipsis" @dblclick="handleDBClick">
+    <div class=" text-left pl-6 w-auto">
+      <!-- 图标和输入字段 -->
+      <div class="flex items-center">
+        <el-icon class="align-middle" :size="20">
+          <House />
+        </el-icon>
+        <!-- <span class="align-middle pl-6" style="overflow:hidden;text-overflow:ellipsis" @dblclick="handleDBClick">
               {{ name }}
             </span> -->
-        <span class="align-middle pl-6" style="overflow:hidden;text-overflow:ellipsis" @dblclick="handleDBClick">
+        <span class="align-middle pl-6" style="overflow: hidden; text-overflow: ellipsis; max-width: 100%;"
+          @dblclick="handleDBClick">
           <el-input class="input-name" style="width:140px" v-model="state.visualName"
             @change="handleChangeVisualName"></el-input>
         </span>
-        <span class="align-middle pl-6 saving-state">{{ savingState }}</span>
-      
+        <span class="align-middle pl-6 saving-state">{{ savingState  }}</span>
+      </div>
     </div>
-    <div class="head_tools ml-64 mr-[400px] w-auto" style="overflow-x:auto;overflow-y:hidden">
+    <!-- <div class="head_tools ml-64 mr-[400px] w-auto" style="overflow-x:auto;overflow-y:hidden"> -->
+    <div class="flex-1 ml-64 sm:ml-auto md:ml-auto lg:ml-400px mr-auto w-full sm:w-auto md:flex-wrap">
       <div class="inline-flex">
         <!--        变色测试按钮  *@author; 王炳宏 -->
         <!-- <el-button @click="attrColor">变色</el-button> -->
         <el-button text @click="undo" :icon="RefreshLeft">撤销</el-button>
         <el-button text @click="redo" :icon="RefreshRight">重做</el-button>
-        <el-button text :icon="Link" @click="changeEditEdgeMode">{{ EditEdgeMode.isEditEdgeMode ? "取消连线" : "连线" }}</el-button>
+        <el-button text :icon="Link" @click="changeEditEdgeMode">{{ EditEdgeMode.isEditEdgeMode ? "取消连线" : "连线"
+        }}</el-button>
         <el-button text @click="zoomToFit" :icon="Crop">自适应</el-button>
         <el-button text @click="zoomOut" :icon="ZoomOut">缩小</el-button>
         <el-button text>{{ state.scaling + '%' }}</el-button>
@@ -40,7 +45,7 @@
           </template>
         </el-upload>
 
-        <el-dropdown class="el-dropdown" @command="handleCommandExport">
+        <!-- <el-dropdown class="el-dropdown" @command="handleCommandExport">
           <span class="el-dropdown-link" @click="handleClickExport">
             <el-button text :icon="Upload">导出</el-button>
             <el-icon class="el-icon--right">
@@ -52,15 +57,17 @@
               <el-dropdown-item command="json">导出JSON</el-dropdown-item>
               <el-dropdown-item command="svg">导出SVG</el-dropdown-item>
               <el-dropdown-item command="png">导出PNG</el-dropdown-item>
-              <!-- <el-dropdown-item command="jpeg">导出JPEG</el-dropdown-item> -->
             </el-dropdown-menu>
           </template>
-        </el-dropdown>
+        </el-dropdown> -->
+        <el-button text @click="handleCommandExport('json')" :icon="Upload">导出</el-button>
+
         <el-button text @click="preview()" :icon="View">预览</el-button>
       </div>
     </div>
 
-    <div class="absolute inset-y-0 right-0 w-auto">
+    <!-- <div class="absolute inset-y-0 right-0 w-auto"> -->
+    <div class="inset-y-0 right-0 flex w-auto">
       <el-button :icon="Share" id="share-btn" @click="state.shareVisible = true">分享</el-button>
       <el-button :icon="UploadFilled" @click="state.publishVisible = true">发布</el-button>
       <el-button :icon="CircleCheck" @click="save(params.id)">保存</el-button>
