@@ -2,7 +2,7 @@
  * @Author: chaoxiaoshu-mx leukotrichia@163.com
  * @Date: 2023-07-21 19:30:35
  * @LastEditors: chaoxiaoshu-mx leukotrichia@163.com
- * @LastEditTime: 2023-10-25 11:27:43
+ * @LastEditTime: 2024-09-09 21:27:35
  * @FilePath: \tp-editor\src\App.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -31,11 +31,11 @@ let { setTokenInfo, getTokenInfo } = useAuthStore();
 const getTokenInfoByAPI = async () => {
   const router = useRouter();
   let { data: result } = await http.post('/api/v1/login', {
-    email: "admin@thingspanel.cn",
-    password: "123456"
+    email: import.meta.env.VITE_USER_NAME,
+    password: import.meta.env.VITE_USER_PASS
   })
   if (result.code === 200) {
-    params.token = result.data.access_token;
+    params.token = result.data.token;
     params.expiresTime = result.data.expires_in;
     setTokenInfo(params);
     // 注入参数
@@ -45,16 +45,15 @@ const getTokenInfoByAPI = async () => {
 }
 
 if (import.meta.env.MODE === 'development') {
-  params.token && setTokenInfo(params);
+  params?.token && setTokenInfo(params);
   const tokenInfo = getTokenInfo();
-  if (tokenInfo.token) {
+  if (tokenInfo.token && tokenInfo.token !== "undefined") {
     // 注入参数
     provide('params', params);
   } else {
     getTokenInfoByAPI();
   }
 } else if (!params.mode) {
-  console.log('App.params', params)
   setTokenInfo(params);
   // 注入参数
   provide('params', params);
