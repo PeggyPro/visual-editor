@@ -12,11 +12,12 @@
       <!-- <span class="align-middle pl-6" style="overflow:hidden;text-overflow:ellipsis" @dblclick="handleDBClick">
               {{ name }}
             </span> -->
-      <span class="align-middle pl-6" style="overflow:hidden;text-overflow:ellipsis" @dblclick="handleDBClick">
-        <el-input class="input-name" style="width:140px" v-model="state.visualName"
-          @change="handleChangeVisualName"></el-input>
-      </span>
-      <span class="align-middle pl-6 saving-state">{{ savingState }}</span>
+        <span class="align-middle pl-6" style="overflow:hidden;text-overflow:ellipsis" @dblclick="handleDBClick">
+          <el-input class="input-name" style="width:140px" v-model="state.visualName"
+            @change="handleChangeVisualName"></el-input>
+        </span>
+        <span class="align-middle pl-6 saving-state">{{ savingState }}</span>
+      
     </div>
     <div class="head_tools ml-64 mr-[400px] w-auto" style="overflow-x:auto;overflow-y:hidden">
       <div class="inline-flex">
