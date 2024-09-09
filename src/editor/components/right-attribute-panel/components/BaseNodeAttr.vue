@@ -86,7 +86,7 @@ const handleChange = async (file: any, uploadFiles: any) => {
   console.log("====handleChange.res.data", res.data)
 
   if (res.data.data) {
-    formData.image.xlink = 'http://dev.thingspanel.cn:9999/' + res.data.data.replace('.', '')
+    formData.image.xlink = import.meta.env.VITE_BASE_URL + res.data.data.file_url.replace('.', '')
     console.log(res.data.data)
   }
 }
