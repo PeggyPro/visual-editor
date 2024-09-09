@@ -216,6 +216,7 @@ export default defineComponent({
     },
     methods: {
         getCurveData(val: any) {
+            console.log("====Curve.getCurveData.val", val)
             if (!val || val === "{}" || JSON.stringify(val) === "{}") return undefined;
             let data: any[] = [];
             let jsonObj = JSON.parse(val);
