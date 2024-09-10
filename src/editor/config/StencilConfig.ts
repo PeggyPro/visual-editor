@@ -69,7 +69,7 @@ class StencilConfig implements IStencilConfig {
             groups: this.groups,
             layoutOptions: {
                 columns: 2,
-                resizeToFit: true,
+                resizeToFit: false,
             },
             stencilGraphWidth: 280,
             stencilGraphHeight: 0,

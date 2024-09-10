@@ -123,8 +123,8 @@ export const useStencil = () => {
         },
         {
             shape: "ellipse",
-            width: 40,
-            height: 20,
+            width: 50,
+            height: 30,
             label: "椭圆",
             attrs: commonAttrs
         },
