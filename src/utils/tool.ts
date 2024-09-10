@@ -75,6 +75,13 @@ const isArray = (obj: any) => {
 }
 
 /**
+ * 判断是否为空
+ */
+const isEmpty = (obj: object | string): boolean => {
+    return (typeof obj === 'undefined' || obj === null || obj === '' || obj === '{}');
+}
+
+/**
  * 解析JSON数据
  * @param str
  * @returns
@@ -230,5 +237,5 @@ async function copyToClipboard(text: string) {
     }
 }
 
-export { message, parseParams, randomString, isJSON, parseJSONData, readFile, exportFile, isArray, rgbtoHex, copyToClipboard, dateFormat }
+export { message, parseParams, randomString, isJSON, isEmpty, parseJSONData, readFile, exportFile, isArray, rgbtoHex, copyToClipboard, dateFormat }
 

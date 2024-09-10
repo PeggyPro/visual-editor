@@ -6,11 +6,13 @@
     }">
     </div>
 </template>
-  
+
+<!-- https://g2plot.antv.antgroup.com/manual/plots/line#%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B -->
 <script lang="ts">
 import { Line } from '@antv/g2plot';
 import { defineComponent } from "vue";
-import { randomString } from "@/utils"
+import { randomString, isEmpty, dateFormat } from "@/utils"
+
 export default defineComponent({
     name: "Gauge",
     components: {
@@ -94,28 +96,14 @@ export default defineComponent({
         }
     },
     mounted() {
-
-        console.log('curve.Main.mounted0', this.data);
-        let temp = this.getCurveData(this.value);
-        let data = temp || this.data;
-        console.log('curve.Main.mounted1', this.id, data);
-        (this.line as any) = new Line(this.id, {
-            data: data,
-            padding: this.padding as any,
-            xField: 'xAxis',
-            yField: 'scales',
-            xAxis: {
-                tickCount: 5,
-            },
-            seriesField: 'category',
-        });
-        (this.line as any).render();
+        this.initCurve();
     },
     watch: {
         formData: {
             handler(val) {
                 if (!val || JSON.stringify(val) === "{}") return;
-                console.log(val);
+                return;
+                console.log("====Curve.formData", val);
                 function hexToRgba(hex: any, alpha: any) {
                     if (!hex?.slice) return "rgba(" + 0 + ", " + 0 + ", " + 0 + ", " + alpha + ")";
                     var r = parseInt(hex.slice(1, 3), 16);
@@ -171,94 +159,49 @@ export default defineComponent({
             },
             deep: true,
         },
-        formData1: {
-            handler(val) {
-                console.log('formData1', val);
-                if (val !== '') {
-                    let arr = Array.from(val)
-                    let jsonStr = arr.join("").replace(/\s+/g, "");
-                    let obj = JSON.parse(jsonStr)
-                    let newArr: any[] = []
-                    console.log('curve.obj.xAxis', obj.xAxis);
-
-                    obj.xAxis.map((item: any, index: number) => {
-                        let newObj = {
-                            xAxis: item.slice(10, 15),
-                            scales: Number(obj.series[0].data[Number(index)])
-                        }
-                        newArr.push(newObj)
-                    });
-                    // this.data
-                    console.log('curve.newArr', newArr);
-                    // this.data = newArr;
-                    if (jsonStr.length > 1) {
-                        (this.line as any).options.data = newArr;
-                        if (obj.series[0].data[obj.series[0].data.length - 1] !== undefined) {
-                            (this.line as any).render()
-
-                        }
-                    }
-                }
-
-            },
-            deep: true,
-        },
         value: {
-            async handler(val) {
-                let data = this.getCurveData(val);
-                if (!data) return;
-                await this.$nextTick();
-                (this.line as any).options.data = data;
-                console.log("this.line", this.line);
-                (this.line as any).render();
+            handler(val) {
+                if (isEmpty(val)) return;
+                let data: Record<string, any>[] = JSON.parse(val).series;
+                if (isEmpty(data)) return;
+                this.updateCurve(data);
             }
         }
     },
     methods: {
-        getCurveData(val: any) {
-            console.log("====Curve.getCurveData.val", val)
-            if (!val || val === "{}" || JSON.stringify(val) === "{}") return undefined;
-            let data: any[] = [];
-            let jsonObj = JSON.parse(val);
-            /*
-                示例：
-                {
-                    "xAxis": [ "2023-07-25 11:39:40", "2023-07-25 16:23:16", "2023-07-25 16:45:29",
-                        "2023-07-25 17:29:11","2023-07-25 18:05:18"],
-                    "series": [
-                        {
-                            "category": "温度",
-                            "data": [ "11","22","33","55","11" ]
-                        },
-                        {
-                            "category": "湿度",
-                            "data": [ "22","33","44","44","22" ]
-                        }
-                    ]
-                }
-            */
-            // 遍历时间
-            for (let i = 0; i < jsonObj.xAxis.length; i++) {
-                    const systime = jsonObj.xAxis[i];
-                    // const hour = (new Date(systime)).getHours()
-                    // const min = (new Date(systime)).getMinutes()
-                    // 遍历series
-                    jsonObj.series.forEach((serie: any) => {
-                        data.push({
-                            category: serie.category || serie.name,
-                            xAxis: systime,
-                            scales: Number(serie.data[i])
-                        })
-                    })
-            }
-            return data;
+        /**
+         * 初始化图表
+         */ 
+        initCurve(data?: Record<string, any>[]) {
+            this.destroyCurve();
+            (this.line as any) = new Line(this.id, {
+                data: data || [],
+                padding: this.padding as any,
+                xField: 'x',
+                yField: 'data',
+                xAxis: {
+                    type: 'time'
+                },
+                seriesField: 'category',
+            });
+            (this.line as any).render();
+        },
+        updateCurve(data: Record<string, any>[]) {
+            if (!this.line) return;
+            (this.line as any).changeData(data)
+        },
+        destroyCurve() {
+            if (this.line) {  
+                (this.line as any).destroy(); // 销毁旧图表  
+                this.line = null;
+            }  
         }
     }
 })
 
 </script>
 
-  
+
 <style lang="scss" scoped>
 .header {
     width: 50px;

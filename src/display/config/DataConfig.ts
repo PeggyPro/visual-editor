@@ -205,6 +205,7 @@ class DataConfig {
                             rate: rate + ""
                             }
                         let { data: result } = await DataAPI.getHistory(params);
+                        console.log("====DataConfig.parseData.curve.result", result)
                         if (result.code === 200) {
                             const data = result.data || [];
                             data.forEach((it: any) => {
@@ -240,6 +241,7 @@ class DataConfig {
                     //     })
                     // }
                 }
+
                 let values = this.getCurveData(systime, datas);
                 this.callback(JSON.stringify(values));
                 resolve(true);
@@ -360,7 +362,7 @@ class DataConfig {
 
     private getCurveData(systime: any, datas: any) {
         const length = systime.length;
-        console.log('DataConfig.getCurveData', systime, length, datas)
+        console.log('====DataConfig.getCurveData', systime, length, datas)
         let series: any[] = [];
         if (length > 5) {
             let xAxis = systime.slice(length - 5);
@@ -368,6 +370,7 @@ class DataConfig {
                 series.push(
                     {
                         category: data.title,
+                        x: data.ts,
                         data: data.value.slice(length - 5),
                     }
                 )
@@ -379,6 +382,7 @@ class DataConfig {
                 series.push(
                     {
                         category: data.title,
+                        x: data.ts,
                         data: data.value,
                     }
                 )
