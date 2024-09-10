@@ -83,16 +83,13 @@ const handleChange = async (file: any, uploadFiles: any) => {
   fd.append('file', file.raw)
   fd.append('type', "logo")
   const res = await PluginAPI.uploadPlugin(fd)
-  console.log("====handleChange.res.data", res.data)
 
   if (res.data.data) {
     formData.image.xlink = import.meta.env.VITE_BASE_URL + res.data.data.file_url.replace('.', '')
-    console.log(res.data.data)
   }
 }
 
 watch(() => props.data, (val) => {
-  console.log('====基础图形.data', JSON.stringify(val))
   if (!val || JSON.stringify(val) === "{}") return;
   let temp = JSON.parse(JSON.stringify(val));
   if (temp.shape === 'rect_img') {
@@ -105,7 +102,6 @@ watch(() => props.data, (val) => {
       temp.attrs.body.fill = "";
     formData.body = { ...temp.attrs.body };
   }
-  console.log('====基础图形.formData', JSON.stringify(formData))
 
 }, { deep: true, immediate: true })
 
@@ -115,7 +111,6 @@ const upImg = () => {
 const emit = defineEmits(["onChange", 'update:visible', 'submit']);
 watch(formData, (val) => {
   // 当自定义属性改变时，传递给Main.vue的style属性
-  console.log('基础图形', val)
   let temp = JSON.parse(JSON.stringify(val));
   if (!temp.body.fill)
     temp.body.fill = "transparent";

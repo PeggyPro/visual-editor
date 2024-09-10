@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Line } from '@antv/g2plot';
 import { defineComponent } from "vue";
-import { randomString, isEmpty, dateFormat } from "@/utils"
+import { randomString, isEmpty, proxyToPlainObject } from "@/utils"
 
 export default defineComponent({
     name: "Gauge",
@@ -30,12 +30,6 @@ export default defineComponent({
                 return {};
             },
         },
-        formData1: {
-            type: [Array, Object, String, Number],
-            default: () => {
-                return {};
-            },
-        },
         value: {
             type: [Object],
             default: () => ({})
@@ -47,20 +41,20 @@ export default defineComponent({
             line: null,
             data: [
                 {
-                    xAxis: '周一',
-                    scales: 10
+                    "x": "2010-01",
+                    "data": 10
                 },
                 {
-                    xAxis: '周二',
-                    scales: 20
+                    "x": "2010-02",
+                    "data": 20
                 },
                 {
-                    xAxis: '周三',
-                    scales: 60
+                    "x": "2010-03",
+                    "data": 60
                 },
                 {
-                    xAxis: '周四',
-                    scales: 12
+                    "x": "2010-04",
+                    "data": 12
                 }
             ],
             border: "border:5px solid red",
@@ -99,11 +93,12 @@ export default defineComponent({
         this.initCurve();
     },
     watch: {
+        // 样式
         formData: {
             handler(val) {
                 if (!val || JSON.stringify(val) === "{}") return;
-                return;
-                console.log("====Curve.formData", val);
+                if (isEmpty(val)) return;
+                const plainObj = proxyToPlainObject(val);
                 function hexToRgba(hex: any, alpha: any) {
                     if (!hex?.slice) return "rgba(" + 0 + ", " + 0 + ", " + 0 + ", " + alpha + ")";
                     var r = parseInt(hex.slice(1, 3), 16);
@@ -111,58 +106,22 @@ export default defineComponent({
                     var b = parseInt(hex.slice(5, 7), 16);
                     return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
                 }
-                this.background = val;
+                // 背景
+                this.background = plainObj;
+                // 背景透明度
                 this.bgColorAndOpicity = hexToRgba(this.background.Color, this.background.slidingblock as any / 10);
-                console.log(this.bgColorAndOpicity);
 
-                // console.log((this.line as any).options);
-                let Xstyle = {
-                    style: {
-                        fontSize: 12,
-                        fill: '',
-                    }
-                };
-                Xstyle.style.fontSize = Number(val.XfontSize);
-                Xstyle.style.fill = val.XTextColor;
-                (this.line as any).options.xAxis.label.style = Xstyle.style;
-
-                let Xline = {
-                    line: {
-                        style: {
-                            stroke: ''
-                        }
-                    }
-                };
-                Xline.line.style.stroke = val.XColor;
-                (this.line as any).options.xAxis.line = Xline.line;
-
-                let Ystyle = {
-                    style: {
-                        fontSize: 12,
-                        fill: '',
-                    }
-                };
-                Ystyle.style.fontSize = Number(val.YfontSize);
-                Ystyle.style.fill = val.YTextColor;
-                (this.line as any).options.yAxis.label.style = Ystyle.style;
-
-                let Yline = {
-                    line: {
-                        style: {
-                            stroke: ''
-                        }
-                    }
-                };
-                Yline.line.style.stroke = val.YColor;
-                (this.line as any).options.yAxis.line = Yline.line;
-                (this.line as any).render();
+                // 设置图表样式
+                this.setOptions(plainObj);
             },
             deep: true,
         },
+        // 图表数据
         value: {
             handler(val) {
                 if (isEmpty(val)) return;
-                let data: Record<string, any>[] = JSON.parse(val).series;
+                const obj = JSON.parse(val);
+                let data: any = obj?.series || obj;
                 if (isEmpty(data)) return;
                 this.updateCurve(data);
             }
@@ -171,30 +130,83 @@ export default defineComponent({
     methods: {
         /**
          * 初始化图表
-         */ 
+         */
         initCurve(data?: Record<string, any>[]) {
             this.destroyCurve();
+            const plainObj = proxyToPlainObject(this.data);
             (this.line as any) = new Line(this.id, {
-                data: data || [],
+                data: data || plainObj,
                 padding: this.padding as any,
+                color: ['#FE740C', '#F70909'],
                 xField: 'x',
                 yField: 'data',
-                xAxis: {
-                    type: 'time'
-                },
+                xAxis: { type: 'time' },
                 seriesField: 'category',
+                theme: 'dark',
             });
             (this.line as any).render();
         },
+        /**
+         * 更新图表数据
+         */
         updateCurve(data: Record<string, any>[]) {
             if (!this.line) return;
             (this.line as any).changeData(data)
         },
+        /**
+         * 销毁图表
+         */
         destroyCurve() {
-            if (this.line) {  
+            if (this.line) {
                 (this.line as any).destroy(); // 销毁旧图表  
                 this.line = null;
-            }  
+            }
+        },
+        /**
+         * 设置图表样式
+         */
+        setOptions(value: any) {
+            const opt = proxyToPlainObject(value);
+            if (isEmpty(opt)) return;
+            const plot = (this.line as any);
+            plot.update({
+                ...this.getOptions(),
+                theme: opt.theme,   // 主题
+                color: opt.lineColor,   // 线条颜色
+                xAxis: {
+                    // 标签
+                    label: {
+                        style: {
+                            fontSize: opt.XfontSize,   // x轴标签文字大小
+                            fill: opt.XTextColor        // x轴标签文字颜色
+                        }
+                    },
+                    // 轴线
+                    line: {
+                        style: {
+                            stroke: opt.XColor   // x轴轴线颜色
+                        }
+                    }
+                },
+                yAxis: {
+                    // 标签
+                    label: {
+                        style: {
+                            fontSize: opt.YfontSize,   // y轴标签文字大小
+                            fill: opt.YTextColor        // y轴标签文字颜色
+                        }
+                    },
+                    // 轴线
+                    line: {
+                        style: {
+                            stroke: opt.YColor   // y轴轴线颜色
+                        }
+                    }
+                }
+            })
+        },
+        getOptions() {
+            return (this.line as any).options;
         }
     }
 })

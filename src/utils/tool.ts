@@ -2,18 +2,18 @@
 import { ElMessage } from 'element-plus'
 
 const message = {
-        success: (msg: string) => {
-            ElMessage({
-                message: msg,
-                type: 'success',
-              })
-        },
-        error: (msg: string) => {
-            ElMessage({
-                message: msg,
-                type: 'error',
-              })
-        }
+    success: (msg: string) => {
+        ElMessage({
+            message: msg,
+            type: 'success',
+        })
+    },
+    error: (msg: string) => {
+        ElMessage({
+            message: msg,
+            type: 'error',
+        })
+    }
 }
 /**
  * 解析URL参数
@@ -59,7 +59,7 @@ const isJSON = (str: string) => {
         try {
             let obj = JSON.parse(str);
             return obj;
-        } catch(e) {
+        } catch (e) {
             return false;
         }
     }
@@ -131,7 +131,7 @@ const exportFile = (fileName: string, content: string) => {
 const ColorToHex = (color: any) => {
     var hexadecimal = color.toString(16);
     return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
-  }
+}
 
 /**
  * rgb转hex
@@ -144,54 +144,54 @@ const rgbtoHex = (rgba: String) => {
     const green = color ? parseInt(color[2]) : 0;
     const blue = color ? parseInt(color[3]) : 0;
     return "#" + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
-  }
+}
 
 const dateFormat = (timestamp: string | number) => {
     if (!timestamp) return "";
     if (timestamp.toString().length === 10) {
-      timestamp = Number(timestamp) * 1000;
+        timestamp = Number(timestamp) * 1000;
     } else if (timestamp.toString().length === 13) {
-      timestamp = timestamp;
-    } else if (timestamp.toString().length === 16) {  
-      timestamp = timestamp.toString().substring(0, 13);
+        timestamp = timestamp;
+    } else if (timestamp.toString().length === 16) {
+        timestamp = timestamp.toString().substring(0, 13);
     } else {
-      return "";
+        return "";
     }
     var n = Number(timestamp);
     var D = new Date(n);
     var year = D.getFullYear(); //四位数年份
-  
+
     var month = D.getMonth() + 1; //月份(0-11),0为一月份
     month = month < 10 ? "0" + month : month;
-  
+
     var day = D.getDate(); //月的某一天(1-31)
     day = day < 10 ? "0" + day : day;
-  
+
     var hours = D.getHours(); //小时(0-23)
     hours = hours < 10 ? "0" + hours : hours;
-  
+
     var minutes = D.getMinutes(); //分钟(0-59)
     minutes = minutes < 10 ? "0" + minutes : minutes;
-  
+
     var seconds = D.getSeconds(); //秒(0-59)
     seconds = seconds < 10 ? "0" + seconds : seconds;
     // var week = D.getDay();//周几(0-6),0为周日
     // var weekArr = ['周日','周一','周二','周三','周四','周五','周六'];
-  
+
     var now_time =
-      year +
-      "-" +
-      month +
-      "-" +
-      day +
-      " " +
-      hours +
-      ":" +
-      minutes +
-      ":" +
-      seconds;
+        year +
+        "-" +
+        month +
+        "-" +
+        day +
+        " " +
+        hours +
+        ":" +
+        minutes +
+        ":" +
+        seconds;
     return now_time;
-  }
+}
 
 async function copyToClipboard(text: string) {
     try {
@@ -212,8 +212,8 @@ async function copyToClipboard(text: string) {
 
         const selection = document.getSelection()
         const originalRange = selection
-          ? selection.rangeCount > 0 && selection.getRangeAt(0)
-          : null
+            ? selection.rangeCount > 0 && selection.getRangeAt(0)
+            : null
 
         document.body.appendChild(element)
         element.select()
@@ -232,10 +232,30 @@ async function copyToClipboard(text: string) {
 
         // Get the focus back on the previously focused element, if any
         if (previouslyFocusedElement) {
-            ;(previouslyFocusedElement as HTMLElement).focus()
+            ; (previouslyFocusedElement as HTMLElement).focus()
         }
     }
 }
 
-export { message, parseParams, randomString, isJSON, isEmpty, parseJSONData, readFile, exportFile, isArray, rgbtoHex, copyToClipboard, dateFormat }
+
+const proxyToPlainObject = <T extends Object>(proxy: T): T => {
+    const plainObject: any = JSON.parse(JSON.stringify(proxy))
+    return plainObject as T;
+}
+
+export { 
+    message, 
+    parseParams, 
+    randomString, 
+    isJSON, 
+    isEmpty, 
+    parseJSONData, 
+    readFile, 
+    exportFile, 
+    isArray, 
+    rgbtoHex, 
+    copyToClipboard, 
+    dateFormat,
+    proxyToPlainObject
+ }
 

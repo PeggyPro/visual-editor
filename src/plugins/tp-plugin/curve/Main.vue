@@ -1,3 +1,4 @@
+
 <template>
   <Line id="yibiaopan" :value="value" :formData="formData" :formData1="formData1"></Line>
 </template>
@@ -42,7 +43,7 @@ export default defineComponent({
     },
     style: {
       handler(val) {
-        console.log("Main.style", val);
+        console.log("====Main.style", val);
         this.formData = val
       },
       deep: true
